@@ -12,6 +12,7 @@ isort = "^5.13.2"
 flake8 = "^7.1.1"
 pandas = "^2.2.2"
 numpy = "^2.1.1"
+pybit = "^5.8.0"
 
 [tool.black]
 line-length = 120

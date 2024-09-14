@@ -1,0 +1,13 @@
+{
+    "kline": {
+        "columns": [
+            "start_time",
+            "open_price",
+            "high_price",
+            "low_price",
+            "close_price",
+            "volume",
+            "turnover"
+        ]
+    }
+}

@@ -1,3 +1,3 @@
 import os
 
-BYBIT_API_KEY = os.getenv("ENV_VAR_BYBIT_API_KEY")
+BYBIT_DEMO_API_KEY = os.getenv("ENV_VAR_BYBIT_DEMO_API_KEY")
