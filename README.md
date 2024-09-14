@@ -1,1 +1,3 @@
-# pybye
+## pybye 🐤
+
+Check pypoetry.toml
