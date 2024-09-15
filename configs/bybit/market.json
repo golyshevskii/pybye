@@ -1,5 +1,6 @@
 {
     "kline": {
+        "file_name": "bybit_kline_{symbol}_{category}_{interval}_{start}_{end}.csv",
         "columns": [
             "start_time",
             "open_price",
