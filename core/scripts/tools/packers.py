@@ -1,10 +1,14 @@
 from typing import Any, Dict, List
 
 import pandas as pd
-from core.scripts.tools.logger import logger
+from core.scripts.tools.logger import get_logger
+
+logger = get_logger(__name__)
 
 
-def pack_data(data: List[List[str]], data_columns: List[str], additional_data: Dict[str, Any]) -> pd.DataFrame:
+def pack_data(
+    data: List[List[str]], data_columns: List[str], additional_data: Dict[str, Any]
+) -> pd.DataFrame:
     """
     Packs data into the DataFrame.
 
