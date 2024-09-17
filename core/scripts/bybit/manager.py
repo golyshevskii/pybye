@@ -1,19 +1,18 @@
+import pandas as pd
 from config import BYBIT_CONFIG_PATH, BYBIT_DWH_PATH
 from core.scripts.bybit.api import get_kline
-from core.scripts.tools.dtt import to_format
+from core.scripts.tools.dtt import CSV_DTT_FORMAT, DTT_FORMAT, to_format
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
+from core.scripts.tools.metrics import calc_sr_levels
 from core.scripts.tools.packers import pack_data
 
 logger = get_logger(__name__)
 
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
 
-DTT_FORMAT = "%Y-%m-%d %H:%M:%S"
-CSV_DTT_FORMAT = "%Y-%m-%dT%H-%M-%S"
 
-
-def import_bybit_kline(symbol: str, interval: str, start: str, end: str, category: str = "spot") -> None:
+def import_bybit_kline(symbol: str, interval: str, start: str, end: str, category: str = "spot") -> str:
     """
     Imports candle stick data from the Bybit API.
 
@@ -23,6 +22,9 @@ def import_bybit_kline(symbol: str, interval: str, start: str, end: str, categor
         start: Datetime from which to start. Format: "YYYY-MM-DD HH:MM:SS"
         end: Datetime until which to end. Format: "YYYY-MM-DD HH:MM:SS"
         category: Product type (spot, linear, inverse).
+
+    Returns:
+        file_name: Name of the file where the data is stored.
     """
     logger.info("BEGIN")
 
@@ -45,7 +47,19 @@ def import_bybit_kline(symbol: str, interval: str, start: str, end: str, categor
     packed_data.to_csv(f"{BYBIT_DWH_PATH}kline/{file_name}", index=False)
 
     logger.info("END")
+    return file_name
 
 
 if __name__ == "__main__":
-    import_bybit_kline(symbol="BTCUSDT", interval="D", start="2024-09-01 00:00:00", end="2024-09-14 00:00:00")
+    from_dtt = "2024-09-01 00:00:00"
+    to_dtt = "2024-09-14 00:00:00"
+
+    D_file = import_bybit_kline(symbol="BTCUSDT", interval="D", start=from_dtt, end=to_dtt)
+    D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
+    D_kline = calc_sr_levels(D_kline, window_size=5)
+    D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
+
+    H_file = import_bybit_kline(symbol="BTCUSDT", interval="60", start=from_dtt, end=to_dtt)
+    H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
+    H_kline = calc_sr_levels(H_kline, window_size=48)
+    H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)
