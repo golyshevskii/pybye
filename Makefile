@@ -1,3 +1,11 @@
+# System
+ROOT_DIR := $(shell powershell -Command "(Get-Location).Path")
+env:
+	powershell -Command "Get-ChildItem Env:"
+
+path:
+	powershell -Command "$$env:PYTHONPATH='$$env:PYTHONPATH;$(ROOT_DIR)';
+
 # Dependencies
 init:
 	poetry install --no-root

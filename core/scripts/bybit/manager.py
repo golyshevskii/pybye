@@ -1,10 +1,10 @@
 import pandas as pd
 from config import BYBIT_CONFIG_PATH, BYBIT_DWH_PATH
 from core.scripts.bybit.api import get_kline
-from core.scripts.tools.dtt import CSV_DTT_FORMAT, DTT_FORMAT, to_format
+from core.scripts.tools.dtt import from_unix
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
-from core.scripts.tools.metrics import calc_sr_levels
+from core.scripts.tools.metrics import calc_psr_levels
 from core.scripts.tools.packers import pack_data
 
 logger = get_logger(__name__)
@@ -12,7 +12,9 @@ logger = get_logger(__name__)
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
 
 
-def import_bybit_kline(symbol: str, interval: str, start: str, end: str, category: str = "spot") -> str:
+def import_bybit_kline(
+    symbol: str, interval: str, start: str = None, end: str = None, category: str = "spot"
+) -> str:
     """
     Imports candle stick data from the Bybit API.
 
@@ -37,13 +39,7 @@ def import_bybit_kline(symbol: str, interval: str, start: str, end: str, categor
         {"category": category, "symbol": symbol, "interval": interval},
     )
 
-    file_name = config["file_name"].format(
-        symbol=symbol,
-        category=category,
-        interval=interval,
-        start=to_format(start, DTT_FORMAT, CSV_DTT_FORMAT),
-        end=to_format(end, DTT_FORMAT, CSV_DTT_FORMAT),
-    )
+    file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
     packed_data.to_csv(f"{BYBIT_DWH_PATH}kline/{file_name}", index=False)
 
     logger.info("END")
@@ -51,15 +47,25 @@ def import_bybit_kline(symbol: str, interval: str, start: str, end: str, categor
 
 
 if __name__ == "__main__":
-    from_dtt = "2024-09-01 00:00:00"
-    to_dtt = "2024-09-14 00:00:00"
+    # from datetime import datetime, timedelta
+
+    # from_dtt = (datetime.now() - timedelta(days=14)).strftime(DTT_FORMAT)
+    # to_dtt = datetime.now().strftime(DTT_FORMAT)
+
+    from_dtt, to_dtt = None, None
 
     D_file = import_bybit_kline(symbol="BTCUSDT", interval="D", start=from_dtt, end=to_dtt)
     D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
-    D_kline = calc_sr_levels(D_kline, window_size=5)
+
+    D_kline = calc_psr_levels(D_kline)
+    D_kline["dtt"] = D_kline["start_time"].apply(lambda x: from_unix(x))
+
     D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
 
     H_file = import_bybit_kline(symbol="BTCUSDT", interval="60", start=from_dtt, end=to_dtt)
     H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
-    H_kline = calc_sr_levels(H_kline, window_size=48)
+
+    H_kline = calc_psr_levels(H_kline)
+    H_kline["dtt"] = H_kline["start_time"].apply(lambda x: from_unix(x))
+
     H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)
