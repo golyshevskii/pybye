@@ -10,7 +10,7 @@ session = HTTP(api_key=BYBIT_DEMO_API_KEY, api_secret=BYBIT_DEMO_API_SECRET)
 
 
 def get_kline(
-    category: str, symbol: str, interval: str, start: str, end: str, limit: int = 1000
+    category: str, symbol: str, interval: str, start: str = None, end: str = None, limit: int = 1000
 ) -> Dict[str, Any]:
     """
     Extracts candle stick data from the Bybit API.
@@ -29,7 +29,7 @@ def get_kline(
         category=category,
         symbol=symbol,
         interval=interval,
-        start=to_unix(start) * 1000,
-        end=to_unix(end) * 1000,
+        start=to_unix(start) * 1000 if start else None,
+        end=to_unix(end) * 1000 if end else None,
         limit=limit,
     )

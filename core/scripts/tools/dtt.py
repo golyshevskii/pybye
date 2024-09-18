@@ -19,7 +19,21 @@ def to_unix(dtt: Union[datetime, str], format: str = DTT_FORMAT, tz: timezone = 
     return int(datetime.strptime(dtt, format).astimezone(tz).timestamp())
 
 
-def to_format(dtt: str, format: str, new_format: str) -> str:
+def from_unix(unix: int, format: str = DTT_FORMAT, tz: timezone = timezone.utc, unit: str = "ms") -> datetime:
+    """
+    Converts Unix timestamp to datetime.
+
+    Params:
+        unix: Unix timestamp.
+        format: Datetime format.
+        tz: Timezone. Default is UTC.
+        unit: Timestamp unit. Default is seconds.
+    """
+    dev = 1000 if unit == "ms" else 1
+    return datetime.fromtimestamp(unix / dev, tz=tz).strftime(format)
+
+
+def to_new_format(dtt: str, format: str, new_format: str) -> str:
     """
     Returns the datetime in the specified format.
 
