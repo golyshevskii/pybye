@@ -1,7 +1,6 @@
 import pandas as pd
 from config import BYBIT_CONFIG_PATH, BYBIT_DWH_PATH
 from core.scripts.bybit.api import get_kline
-from core.scripts.tools.dtt import from_unix
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
 from core.scripts.tools.metrics import calc_psr_levels
@@ -48,24 +47,26 @@ def import_bybit_kline(
 
 if __name__ == "__main__":
     # from datetime import datetime, timedelta
+    import argparse
 
-    # from_dtt = (datetime.now() - timedelta(days=14)).strftime(DTT_FORMAT)
-    # to_dtt = datetime.now().strftime(DTT_FORMAT)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbol", type=str, required=False, default="BTCUSDT")
 
-    from_dtt, to_dtt = None, None
+    args = parser.parse_args()
+    SYMBOL = args.symbol
 
-    D_file = import_bybit_kline(symbol="BTCUSDT", interval="D", start=from_dtt, end=to_dtt)
+    D_file = import_bybit_kline(symbol=SYMBOL, interval="D")
     D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
 
     D_kline = calc_psr_levels(D_kline)
-    D_kline["dtt"] = D_kline["start_time"].apply(lambda x: from_unix(x))
+    D_kline["dtt"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
 
     D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
 
-    H_file = import_bybit_kline(symbol="BTCUSDT", interval="60", start=from_dtt, end=to_dtt)
+    H_file = import_bybit_kline(symbol=SYMBOL, interval="60")
     H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
 
     H_kline = calc_psr_levels(H_kline)
-    H_kline["dtt"] = H_kline["start_time"].apply(lambda x: from_unix(x))
+    H_kline["dtt"] = pd.to_datetime(H_kline["start_time"], unit="ms", utc=True)
 
     H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)

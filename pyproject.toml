@@ -14,6 +14,8 @@ pandas = "^2.2.2"
 numpy = "^2.1.1"
 pybit = "^5.8.0"
 python-dotenv = "^1.0.1"
+backtesting = "^0.3.3"
+bokeh = "3.1.0"
 
 [tool.black]
 line-length = 110
