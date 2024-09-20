@@ -19,6 +19,8 @@ lint:
 format:
 	cd .github/lint && poetry run black --config pyproject.toml ../../core/scripts/
 	cd .github/lint && poetry run isort --settings-path pyproject.toml ../../core/scripts/
+	cd .github/lint && poetry run black --config pyproject.toml ../../tests/
+	cd .github/lint && poetry run isort --settings-path pyproject.toml ../../tests/
 
 check-lint:
 	cd .github/lint && poetry run black --config pyproject.toml --check ../../core/scripts/

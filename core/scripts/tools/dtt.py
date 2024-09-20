@@ -19,9 +19,11 @@ def to_unix(dtt: Union[datetime, str], format: str = DTT_FORMAT, tz: timezone = 
     return int(datetime.strptime(dtt, format).astimezone(tz).timestamp())
 
 
-def from_unix(unix: int, format: str = DTT_FORMAT, tz: timezone = timezone.utc, unit: str = "ms") -> datetime:
+def from_unix_to_dtt_str(
+    unix: int, format: str = DTT_FORMAT, tz: timezone = timezone.utc, unit: str = "ms"
+) -> str:
     """
-    Converts Unix timestamp to datetime.
+    Converts Unix timestamp to datetime string.
 
     Params:
         unix: Unix timestamp.
