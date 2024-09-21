@@ -23,7 +23,7 @@ def get_kline(
         end: Datetime until which to end. Format: "YYYY-MM-DD HH:MM:SS"
         limit: Number of candles to return. Max is 1000.
     """
-    logger.info(f"Importing {interval} kline data for {symbol} between {start} and {end}...")
+    logger.info(f"Importing {interval} kline data for {symbol}")
 
     return session.get_kline(
         category=category,
@@ -33,3 +33,15 @@ def get_kline(
         end=to_unix(end) * 1000 if end else None,
         limit=limit,
     )
+
+
+def get_symbol_info(category: str = "spot", symbol: str = None) -> Dict[str, Any]:
+    """
+    Extracts symbol info from the Bybit API.
+
+    Params:
+        category: Product type (spot, linear, inverse).
+        symbol: Symbol name. Example: BTCUSDT
+    """
+    logger.info(f"Importing {symbol} info")
+    return session.get_instruments_info(category=category, symbol=symbol)

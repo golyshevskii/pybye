@@ -10,5 +10,12 @@
             "volume",
             "turnover"
         ]
+    },
+    "symbol_info": {
+        "file_name": "bybit_symbol_info_{symbol}_{category}.csv",
+        "columns": [
+            "symbol",
+            "status"
+        ]
     }
 }
