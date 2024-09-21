@@ -59,7 +59,7 @@ if __name__ == "__main__":
     D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
 
     # D_kline = calc_psr_levels(D_kline)
-    D_kline = calc_rolling_sr_levels(D_kline, window_size=10)
+    D_kline = calc_rolling_sr_levels(D_kline, window_size=20)
     D_kline["dtt"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
 
     D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
 
     # H_kline = calc_psr_levels(H_kline)
-    H_kline = calc_rolling_sr_levels(H_kline, window_size=10)
+    H_kline = calc_rolling_sr_levels(H_kline, window_size=20)
     H_kline["dtt"] = pd.to_datetime(H_kline["start_time"], unit="ms", utc=True)
 
     H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)

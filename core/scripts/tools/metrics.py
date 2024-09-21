@@ -20,7 +20,6 @@ def calc_rolling_sr_levels(
 
     data["resistance"] = data["close_price"].rolling(window=window_size, min_periods=1).max().shift(1)
     data["support"] = data["close_price"].rolling(window=window_size, min_periods=1).min().shift(1)
-    data.dropna(subset=["resistance", "support"], inplace=True)
 
     logger.info(f"Support and resistance levels have been calculated. Shape: {data.shape}.")
     return data

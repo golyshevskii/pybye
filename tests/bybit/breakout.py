@@ -4,8 +4,16 @@ from config import BYBIT_DWH_PATH
 from tests.tools.backtest import BreakoutStrategy
 
 if __name__ == "__main__":
-    D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_WIFUSDT_spot_D.csv")
-    H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_WIFUSDT_spot_60.csv")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbol", type=str, required=False, default="BTCUSDT")
+
+    args = parser.parse_args()
+    SYMBOL = args.symbol
+
+    D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_{SYMBOL}_spot_D.csv")
+    H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_{SYMBOL}_spot_60.csv")
 
     # Convert start_time to datetime and set it as index for better results in the backtest
     D_kline["start_time"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
@@ -22,11 +30,12 @@ if __name__ == "__main__":
 
     # Run the backtest
     bs = BreakoutStrategy
-    bs.resistance_levels = D_kline["resistance"]
+    bs.RL = D_kline["resistance"]
 
     bt = Backtest(H_kline, bs, cash=100000, commission=0.002)
     stats = bt.run()
-    bt.plot()
 
-    # Output the results
-    print(stats)
+    optimizer = bt.optimize(TP_PERCENTAGE=range(10, 31, 1), maximize="Equity Final [$]")
+
+    print(stats, optimizer, sep="\n\n")
+    bt.plot()
