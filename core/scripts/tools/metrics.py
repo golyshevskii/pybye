@@ -4,7 +4,7 @@ from core.scripts.tools.logger import get_logger
 logger = get_logger(__name__)
 
 
-def calc_sr_levels(
+def calc_rolling_sr_levels(
     data: pd.DataFrame, window_size: int, sort_by: str = "start_time", ascending: bool = True
 ) -> pd.DataFrame:
     """
@@ -18,17 +18,18 @@ def calc_sr_levels(
     """
     data = data.sort_values(by=sort_by, ascending=ascending)
 
-    data["resistance"] = data["high_price"].rolling(window=window_size).max()
-    data["support"] = data["low_price"].rolling(window=window_size).min()
+    data["resistance"] = data["close_price"].rolling(window=window_size, min_periods=1).max().shift(1)
+    data["support"] = data["close_price"].rolling(window=window_size, min_periods=1).min().shift(1)
     data.dropna(subset=["resistance", "support"], inplace=True)
 
     logger.info(f"Support and resistance levels have been calculated. Shape: {data.shape}.")
     return data
 
 
-def calc_psr_levels(data: pd.DataFrame) -> pd.DataFrame:
+def calc_pivot_sr_levels(data: pd.DataFrame) -> pd.DataFrame:
     """
     Calculates pivot, support and resistance levels.
+
 
     Params:
         data: DataFrame containing the candle data.

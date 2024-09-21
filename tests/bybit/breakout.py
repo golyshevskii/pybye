@@ -17,8 +17,8 @@ if __name__ == "__main__":
     H_kline.sort_index(inplace=True, ascending=True)
 
     # Renaming columns to match backtesting format
-    H_kline = H_kline[["open_price", "high_price", "low_price", "close_price"]]
-    H_kline.columns = ["Open", "High", "Low", "Close"]
+    H_kline = H_kline[["open_price", "high_price", "low_price", "close_price", "volume"]]
+    H_kline.columns = ["Open", "High", "Low", "Close", "Volume"]
 
     # Run the backtest
     bs = BreakoutStrategy
