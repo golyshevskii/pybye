@@ -7,8 +7,8 @@ logger = get_logger(__name__)
 
 class BreakoutStrategy(Strategy):
     ATR_PERIOD = 10
-    TP_PERCENTAGE = 6
-    SL_PERCENTAGE = 2
+    TP_PERCENTAGE = 9
+    SL_PERCENTAGE = 3
     RL = None
 
     def init(self):
@@ -21,14 +21,20 @@ class BreakoutStrategy(Strategy):
 
         close_price = self.data.Close[-1]
         if close_price > resistance:
-            breakout_close = close_price
-            entry_price = (resistance + breakout_close) / 2
-            # atr_value = self.atr[-1]
+            ep = (resistance + close_price) / 2
 
-            # Define a tighter stop-loss and take-profit
-            sl = entry_price * (1 - self.SL_PERCENTAGE / 100)
-            tp = entry_price * (1 + self.TP_PERCENTAGE / 100)
+            # Define stop-loss and take-profit
+            sl = ep * (1 - self.SL_PERCENTAGE / 100)
+            tp = ep * (1 + self.TP_PERCENTAGE / 100)
 
-            # Place the trade
-            # logger.info(f"BREAKOUT! EP: {round(entry_price, 2)}, SL: {round(sl, 2)}, TP: {round(tp, 2)}")
-            self.buy(sl=sl, tp=tp)
+            # Additional check to ensure valid sl and tp
+            if sl <= 0 or sl >= ep or tp <= ep:
+                return  # Skip trade
+
+            # Proceed with valid trade setup
+            # logger.info(f"BREAKOUT! EP: {round(ep, 2)}, SL: {round(sl, 2)}, TP: {round(tp, 2)}")
+            try:
+                # Proceed with valid trade setup
+                self.buy(sl=sl, tp=tp)
+            except ValueError:
+                return  # Skip invalid order

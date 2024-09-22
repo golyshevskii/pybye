@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 from backtesting import Backtest
 from config import BYBIT_DWH_PATH
 from tests.tools.backtest import BreakoutStrategy
@@ -34,8 +36,26 @@ if __name__ == "__main__":
 
     bt = Backtest(H_kline, bs, cash=100000, commission=0.002)
     stats = bt.run()
+    # print(stats, end="\n\n")
 
-    optimizer = bt.optimize(TP_PERCENTAGE=range(10, 31, 1), maximize="Equity Final [$]")
+    optimizer = bt.optimize(
+        TP_PERCENTAGE=range(3, 21, 1),
+        SL_PERCENTAGE=range(3, 21, 1),
+        maximize="Equity Final [$]",
+        method="grid",
+        return_heatmap=True,
+    )
 
-    print(stats, optimizer, sep="\n\n")
+    print(f"\n\n{'='*20} STATS {'='*20}\n{optimizer[0]}\n\n{'='*20} SL & TP {'='*20}\n{optimizer[1]}\n\n")
     bt.plot()
+
+    sl_tp_df = optimizer[1].reset_index(name="Equity_Final")
+    heatmap_data = sl_tp_df.pivot(index="TP_PERCENTAGE", columns="SL_PERCENTAGE", values="Equity_Final")
+
+    # Create the heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap="coolwarm", cbar_kws={"label": "Equity Final [$]"})
+    plt.title("Equity Final Heatmap for TP and SL Percentages")
+    plt.xlabel("SL Percentage")
+    plt.ylabel("TP Percentage")
+    plt.show()
