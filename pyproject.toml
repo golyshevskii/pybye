@@ -16,6 +16,8 @@ pybit = "^5.8.0"
 python-dotenv = "^1.0.1"
 backtesting = "^0.3.3"
 bokeh = "3.1.0"
+scikit-optimize = "^0.10.2"
+seaborn = "^0.13.2"
 
 [tool.black]
 line-length = 110

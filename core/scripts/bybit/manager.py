@@ -3,11 +3,10 @@ from config import BYBIT_CONFIG_PATH, BYBIT_DWH_PATH
 from core.scripts.bybit.api import get_kline
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
-from core.scripts.tools.metrics import calc_psr_levels
+from core.scripts.tools.metrics import calc_rolling_sr_levels
 from core.scripts.tools.packers import pack_data
 
 logger = get_logger(__name__)
-
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
 
 
@@ -27,7 +26,7 @@ def import_bybit_kline(
     Returns:
         file_name: Name of the file where the data is stored.
     """
-    logger.info("BEGIN")
+    logger.debug("BEGIN")
 
     data = get_kline(category=category, symbol=symbol, interval=interval, start=start, end=end)
 
@@ -41,7 +40,7 @@ def import_bybit_kline(
     file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
     packed_data.to_csv(f"{BYBIT_DWH_PATH}kline/{file_name}", index=False)
 
-    logger.info("END")
+    logger.debug("END")
     return file_name
 
 
@@ -58,7 +57,7 @@ if __name__ == "__main__":
     D_file = import_bybit_kline(symbol=SYMBOL, interval="D")
     D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
 
-    D_kline = calc_psr_levels(D_kline)
+    D_kline = calc_rolling_sr_levels(D_kline, window_size=2)
     D_kline["dtt"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
 
     D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     H_file = import_bybit_kline(symbol=SYMBOL, interval="60")
     H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
 
-    H_kline = calc_psr_levels(H_kline)
+    H_kline = calc_rolling_sr_levels(H_kline, window_size=48)
     H_kline["dtt"] = pd.to_datetime(H_kline["start_time"], unit="ms", utc=True)
 
     H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)

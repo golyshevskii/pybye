@@ -23,7 +23,7 @@ def get_kline(
         end: Datetime until which to end. Format: "YYYY-MM-DD HH:MM:SS"
         limit: Number of candles to return. Max is 1000.
     """
-    logger.info(f"Importing {interval} kline data for {symbol} between {start} and {end}...")
+    logger.info(f"Importing {interval} kline data for {symbol}")
 
     return session.get_kline(
         category=category,
