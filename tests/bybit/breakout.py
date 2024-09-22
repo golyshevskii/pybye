@@ -3,7 +3,38 @@ import pandas as pd
 import seaborn as sns
 from backtesting import Backtest
 from config import BYBIT_DWH_PATH
+from core.scripts.tools.logger import get_logger
 from tests.tools.backtest import BreakoutStrategy
+
+logger = get_logger(__name__)
+
+
+def optimize(bt: Backtest):
+    """
+    Optimize the TP and SL percentages
+
+    Params:
+        bt: The Backtest object
+    """
+    optimizer, heatmap = bt.optimize(
+        TP_PERCENTAGE=range(1, 10, 1),
+        SL_PERCENTAGE=range(1, 5, 1),
+        maximize="Equity Final [$]",
+        return_heatmap=True,
+    )
+    logger.info(f"\n\n{'='*20} STATS {'='*20}\n{optimizer}\n\n{'='*20} SL & TP {'='*20}\n{heatmap}\n\n")
+
+    heatmap = heatmap.reset_index(name="Equity_Final")
+    heatmap = heatmap.pivot(index="TP_PERCENTAGE", columns="SL_PERCENTAGE", values="Equity_Final")
+
+    # Create the heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(heatmap, annot=True, fmt=".2f", cmap="coolwarm", cbar_kws={"label": "Equity Final [$]"})
+    plt.title("Equity Final Heatmap for TP and SL Percentages")
+    plt.xlabel("SL Percentage")
+    plt.ylabel("TP Percentage")
+    plt.show()
+
 
 if __name__ == "__main__":
     import argparse
@@ -35,27 +66,8 @@ if __name__ == "__main__":
     bs.RL = D_kline["resistance"]
 
     bt = Backtest(H_kline, bs, cash=100000, commission=0.002)
+    # optimize(bt)
+
     stats = bt.run()
-    # print(stats, end="\n\n")
-
-    optimizer = bt.optimize(
-        TP_PERCENTAGE=range(3, 21, 1),
-        SL_PERCENTAGE=range(3, 21, 1),
-        maximize="Equity Final [$]",
-        method="grid",
-        return_heatmap=True,
-    )
-
-    print(f"\n\n{'='*20} STATS {'='*20}\n{optimizer[0]}\n\n{'='*20} SL & TP {'='*20}\n{optimizer[1]}\n\n")
+    logger.info(stats)
     bt.plot()
-
-    sl_tp_df = optimizer[1].reset_index(name="Equity_Final")
-    heatmap_data = sl_tp_df.pivot(index="TP_PERCENTAGE", columns="SL_PERCENTAGE", values="Equity_Final")
-
-    # Create the heatmap
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(heatmap_data, annot=True, fmt=".2f", cmap="coolwarm", cbar_kws={"label": "Equity Final [$]"})
-    plt.title("Equity Final Heatmap for TP and SL Percentages")
-    plt.xlabel("SL Percentage")
-    plt.ylabel("TP Percentage")
-    plt.show()

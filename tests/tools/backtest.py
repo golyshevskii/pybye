@@ -7,8 +7,8 @@ logger = get_logger(__name__)
 
 class BreakoutStrategy(Strategy):
     ATR_PERIOD = 10
-    TP_PERCENTAGE = 9
-    SL_PERCENTAGE = 3
+    TP_PERCENTAGE = 5
+    SL_PERCENTAGE = 2
     RL = None
 
     def init(self):
