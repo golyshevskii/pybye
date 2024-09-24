@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Optional
 
 import pandas as pd
-from core.scripts.tools.logger import get_logger
+from core.scripts.tools.logger import GREEN, RED, RESET, get_logger
 
 logger = get_logger(__name__)
 
@@ -45,10 +45,7 @@ def calc_pivot_sr_levels(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def calc_change(
-    data: Union[pd.DataFrame, List[Dict[str, Any]]],
-    interval: int,
-    period: Optional[int] = None,
-    round_to: int = 2,
+    data: pd.Series, interval: int, symbol: str = None, lookback: Optional[int] = None, round_to: int = 3
 ) -> float:
     """
     Calculates the % change between symbol klines.
@@ -56,28 +53,39 @@ def calc_change(
     Params:
         data: DataFrame or list of dictionaries containing the klines data.
         interval: Interval of the klines data (in minutes).
-        period: Lookback period for the change calculation (in minutes).
+        lookback: Lookback period for the change calculation (in hours).
         round_to: Number of decimal places to round to.
     """
-    if period is None:
+    if lookback is None:
         if interval == 5:
-            period = 60  # 1 hour
+            lookback = 1
         elif interval == 15:
-            period = 240  # 4 hours
+            lookback = 4
         elif interval == 60:
-            period = 720  # 12 hours
+            lookback = 16
         elif interval == 240:
-            period = 5760  # 4 days
-        elif interval == 1440:
-            period = 10080  # 1 week
+            lookback = 64
         else:
-            raise ValueError("Invalid interval. Required: 5, 15, 60, 240, 1440")
+            raise ValueError("Invalid interval. Required: 5, 15, 60, 240")
 
-    idx = period * 60 // interval
+    idx = lookback * 60 // interval
+    change = round((float(data.iloc[0]) / float(data.iloc[idx]) - 1) * 100, round_to)
 
-    if isinstance(data, pd.DataFrame):
-        return round(
-            (float(data["close_price"].iloc[-1]) / float(data["close_price"].iloc[-idx]) - 1) * 100, round_to
-        )
+    color = GREEN if change > 0 else RED
+    logger.info(f"{symbol}: {color}{change}{RESET}%")
+    return change
 
-    return round((float(data[-1]["close_price"]) / float(data[-idx]["close_price"]) - 1) * 100, round_to)
+
+def calc_sma(data: pd.Series, window_size: int) -> Optional[float]:
+    """
+    Calculates the simple moving average.
+
+    Params:
+        data: DataFrame or Series containing the price data.
+        window_size: Window size for the moving average.
+    """
+    if len(data) < window_size:
+        logger.warning(f"Not enough data to calculate SMA. Required: {window_size}")
+        return
+
+    return data.rolling(window=window_size).mean().iloc[-1]

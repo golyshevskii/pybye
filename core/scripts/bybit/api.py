@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from config import BYBIT_DEMO_API_KEY, BYBIT_DEMO_API_SECRET
 from core.scripts.tools.dtt import to_unix
@@ -10,7 +10,12 @@ session = HTTP(api_key=BYBIT_DEMO_API_KEY, api_secret=BYBIT_DEMO_API_SECRET)
 
 
 def get_kline(
-    category: str, symbol: str, interval: str, start: str = None, end: str = None, limit: int = 1000
+    category: str,
+    symbol: str,
+    interval: str,
+    start: Union[str, int] = None,
+    end: Union[str, int] = None,
+    limit: int = 1000,
 ) -> Dict[str, Any]:
     """
     Extracts candle stick data from the Bybit API.
@@ -29,8 +34,8 @@ def get_kline(
         category=category,
         symbol=symbol,
         interval=interval,
-        start=to_unix(start) * 1000 if start else None,
-        end=to_unix(end) * 1000 if end else None,
+        start=to_unix(start) * 1000 if isinstance(start, str) else start,
+        end=to_unix(end) * 1000 if isinstance(end, str) else end,
         limit=limit,
     )
 
