@@ -1,9 +1,7 @@
-import pandas as pd
-from config import BYBIT_CONFIG_PATH, BYBIT_DWH_PATH
-from core.scripts.bybit.api import get_kline
+from config import BYBIT_CONFIG_PATH, BYBIT_DATA_PATH
+from core.scripts.bybit.api import get_kline, get_symbol_info
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
-from core.scripts.tools.metrics import calc_rolling_sr_levels
 from core.scripts.tools.packers import pack_data
 
 logger = get_logger(__name__)
@@ -38,34 +36,28 @@ def import_bybit_kline(
     )
 
     file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
-    packed_data.to_csv(f"{BYBIT_DWH_PATH}kline/{file_name}", index=False)
+    packed_data.to_csv(f"{BYBIT_DATA_PATH}kline/{file_name}", index=False)
 
     logger.debug("END")
     return file_name
 
 
-if __name__ == "__main__":
-    # from datetime import datetime, timedelta
-    import argparse
+def import_bybit_symbol_info(category: str = "spot", symbol: str = None) -> str:
+    """
+    Imports symbol info from the Bybit API.
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--symbol", type=str, required=False, default="BTCUSDT")
+    Params:
+        category: Product type (spot, linear, inverse).
+        symbol: Symbol name. Example: BTCUSDT
+    """
+    logger.debug("BEGIN")
+    data = get_symbol_info(category=category, symbol=symbol)
 
-    args = parser.parse_args()
-    SYMBOL = args.symbol
+    config = MARKET_CONFIG["symbol_info"]
+    packed_data = pack_data(data["result"]["list"], config["columns"], {"category": category})
 
-    D_file = import_bybit_kline(symbol=SYMBOL, interval="D")
-    D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{D_file}")
+    file_name = config["file_name"].format(symbol=symbol, category=category)
+    packed_data.to_csv(f"{BYBIT_DATA_PATH}info/{file_name}", index=False)
 
-    D_kline = calc_rolling_sr_levels(D_kline, window_size=2)
-    D_kline["dtt"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
-
-    D_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{D_file}", index=False)
-
-    H_file = import_bybit_kline(symbol=SYMBOL, interval="60")
-    H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/{H_file}")
-
-    H_kline = calc_rolling_sr_levels(H_kline, window_size=48)
-    H_kline["dtt"] = pd.to_datetime(H_kline["start_time"], unit="ms", utc=True)
-
-    H_kline.to_csv(f"{BYBIT_DWH_PATH}kline/{H_file}", index=False)
+    logger.debug("END")
+    return file_name
