@@ -7,7 +7,7 @@ logger = get_logger(__name__)
 
 
 def pack_data(
-    data: List[List[str]], data_columns: List[str], additional_data: Dict[str, Any]
+    data: List[List[str]], data_columns: List[str], additional_data: Dict[str, Any] = None
 ) -> pd.DataFrame:
     """
     Packs data into the DataFrame.
@@ -19,8 +19,9 @@ def pack_data(
     """
     df = pd.DataFrame(data, columns=data_columns)
 
-    for column, value in additional_data.items():
-        df[column] = value
+    if additional_data is not None:
+        for column, value in additional_data.items():
+            df[column] = value
 
     logger.info(f"Data has been packed. Shape: {df.shape}.")
     return df

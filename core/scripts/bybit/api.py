@@ -43,5 +43,5 @@ def get_symbol_info(category: str = "spot", symbol: str = None) -> Dict[str, Any
         category: Product type (spot, linear, inverse).
         symbol: Symbol name. Example: BTCUSDT
     """
-    logger.info(f"Importing {symbol} info")
+    logger.info(f"Importing {symbol} symbol info")
     return session.get_instruments_info(category=category, symbol=symbol)

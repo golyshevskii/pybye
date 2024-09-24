@@ -1,6 +1,10 @@
 import logging
 import time
 
+RED = "\033[91m"
+GREEN = "\033[92m"
+RESET = "\033[0m"
+
 
 def get_logger(name):
     logger = logging.getLogger(name)
