@@ -4,6 +4,8 @@ import time
 RED = "\033[91m"
 GREEN = "\033[92m"
 RESET = "\033[0m"
+YELLOW_BG = "\033[43m"
+BLUE_BG = "\033[44m"
 
 
 def get_logger(name):
@@ -21,3 +23,7 @@ def get_logger(name):
         logger.addHandler(console_handler)
 
     return logger
+
+
+def color_text(text: str, color_code: str) -> str:
+    return f"{color_code}{text}{RESET}"

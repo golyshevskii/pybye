@@ -6,7 +6,7 @@ from core.scripts.bybit.api import get_kline, get_symbol_info
 from core.scripts.bybit.utils import to_min_interval
 from core.scripts.tools.dtt import to_unix
 from core.scripts.tools.files import read_file
-from core.scripts.tools.logger import get_logger
+from core.scripts.tools.logger import RESET, YELLOW_BG, get_logger
 from core.scripts.tools.metrics import calc_change, calc_sma
 from core.scripts.tools.packers import pack_data
 
@@ -72,10 +72,11 @@ def import_bybit_symbol_info(symbol: str = None, category: str = "spot") -> str:
 def scan_bybit_symbol(
     symbol: str = None,
     category: str = "spot",
-    interval: str = "60",
+    interval: str = "15",
     lookback: int = 4,
     only: str = "USDT",
     min_volume: int = 2000000,
+    max_symbols: int = 50,
 ):
     """
     Scans a symbol for potential trading opportunities.
@@ -86,6 +87,8 @@ def scan_bybit_symbol(
         interval: Kline interval. 1,3,5,15,30,60,120,240,360,720,D,M,W
         lookback: Lookback in hours.
         only: Only look at symbols ending with this currency.
+        min_volume: Minimum volume to consider.
+        max_symbols: Maximum number of symbols to consider.
     """
     logger.debug("BEGIN")
 
@@ -95,8 +98,7 @@ def scan_bybit_symbol(
     end = datetime.now(timezone.utc)
     start = end - timedelta(hours=lookback)
 
-    changes = []
-    i = 0
+    changes, i = [], 0
     for info in symbol_info:
         symbol = info["symbol"]
 
@@ -110,18 +112,17 @@ def scan_bybit_symbol(
             )["result"]["list"]
             klines = pack_data(data, config["columns"])
 
-            close_prices = klines["close_price"]
-            prices = pd.Series(float(price) for price in close_prices)
+            prices = pd.Series(float(price) for price in klines["close_price"])
             volumes = pd.Series(float(volume) for volume in klines["volume"])
 
-            total_volume = volumes.sum()
+            total_volume = sum(volumes)
             if total_volume >= min_volume:
                 changes.append(
                     {
                         "symbol": symbol,
-                        "current_price": prices.iloc[-1],
+                        "current_price": prices.iloc[0],
                         "change": calc_change(
-                            close_prices, interval=to_min_interval(interval), symbol=symbol, lookback=lookback
+                            prices, interval=to_min_interval(interval), symbol=symbol, lookback=lookback
                         ),
                         "total_volume": round(total_volume),
                         "sma": calc_sma(prices, len(prices)),
@@ -129,10 +130,13 @@ def scan_bybit_symbol(
                 )
                 i += 1
 
-        if i > 5:
+        if i >= max_symbols:
             break
 
     file_name = f"{category}_{interval}_scan.csv"
-    pd.DataFrame(changes).to_csv(f"{BYBIT_DATA_PATH}scan/{file_name}", index=False)
+    scaned_symbols = pd.DataFrame(changes).sort_values(by="change", ascending=False)
+    scaned_symbols.to_csv(f"{BYBIT_DATA_PATH}scan/{file_name}", index=False)
 
+    logger.info(f"Top token: {YELLOW_BG}{scaned_symbols['symbol'].iloc[0]}{RESET}")
     logger.debug("END")
+    return file_name

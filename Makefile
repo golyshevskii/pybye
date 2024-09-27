@@ -12,9 +12,9 @@ init:
 
 # Linting & Formatting
 lint:
-	cd .github/lint && poetry run black --config pyproject.toml ../../core/scripts/
-	cd .github/lint && poetry run isort --settings-path pyproject.toml ../../core/scripts/
-	cd .github/lint && poetry run flake8 --config .flake8 ../../core/scripts/
+	cd .github/lint && poetry run black --config pyproject.toml ../../core/
+	cd .github/lint && poetry run isort --settings-path pyproject.toml ../../core/
+	cd .github/lint && poetry run flake8 --config .flake8 ../../core/
 
 format:
 	cd .github/lint && poetry run black --config pyproject.toml ../../core/scripts/

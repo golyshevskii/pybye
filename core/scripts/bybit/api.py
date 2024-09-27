@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, Union
 
 from config import BYBIT_DEMO_API_KEY, BYBIT_DEMO_API_SECRET
@@ -13,8 +14,8 @@ def get_kline(
     category: str,
     symbol: str,
     interval: str,
-    start: Union[str, int] = None,
-    end: Union[str, int] = None,
+    start: Union[int, str, datetime] = None,
+    end: Union[int, str, datetime] = None,
     limit: int = 1000,
 ) -> Dict[str, Any]:
     """
@@ -24,8 +25,8 @@ def get_kline(
         category: Product type (spot, linear, inverse).
         symbol: Symbol name. Example: BTCUSDT
         interval: Kline interval. 1,3,5,15,30,60,120,240,360,720,D,M,W
-        start: Datetime from which to start. Format: "YYYY-MM-DD HH:MM:SS"
-        end: Datetime until which to end. Format: "YYYY-MM-DD HH:MM:SS"
+        start: Timestamp (ms) from which to start
+        end: Timestamp (ms) until which to end
         limit: Number of candles to return. Max is 1000.
     """
     logger.info(f"Importing {interval} kline data for {symbol}")
@@ -34,8 +35,8 @@ def get_kline(
         category=category,
         symbol=symbol,
         interval=interval,
-        start=to_unix(start) * 1000 if isinstance(start, str) else start,
-        end=to_unix(end) * 1000 if isinstance(end, str) else end,
+        start=to_unix(start) * 1000 if isinstance(start, (str, datetime)) else start,
+        end=to_unix(end) * 1000 if isinstance(end, (str, datetime)) else end,
         limit=limit,
     )
 
@@ -47,6 +48,7 @@ def get_symbol_info(category: str = "spot", symbol: str = None) -> Dict[str, Any
     Params:
         category: Product type (spot, linear, inverse).
         symbol: Symbol name. Example: BTCUSDT
+        exclude: List of symbols to exclude.
     """
-    logger.info(f"Importing {symbol} symbol info")
+    logger.info(f"Importing {symbol or 'all'} symbol info")
     return session.get_instruments_info(category=category, symbol=symbol)
