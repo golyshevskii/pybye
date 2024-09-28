@@ -38,8 +38,8 @@ if __name__ == "__main__":
             "volume": "float",
         }
     )
-    kline["resistance"] = kline["high_price"].rolling(window=24, min_periods=1).max().shift(1)
-    kline["avg_volume"] = kline["volume"].rolling(window=24, min_periods=1).mean().shift(1)
+    kline["resistance"] = kline["high_price"].rolling(window=12, min_periods=1).max().shift(1)
+    kline["avg_volume"] = kline["volume"].rolling(window=12, min_periods=1).mean().shift(1)
 
     kline = kline[
         ["open_price", "high_price", "low_price", "close_price", "volume", "avg_volume", "resistance"]
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     bs = BreakoutStrategyV2
     bs.RL = kline["Resistance"]
 
-    bt = Backtest(kline, bs, cash=100, commission=0.01)
+    bt = Backtest(kline, bs, cash=100, commission=0.001)
     # optimize(bt)
 
     stats = bt.run()
