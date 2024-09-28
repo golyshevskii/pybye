@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pandas as pd
-from core.scripts.tools.logger import GREEN, RED, RESET, get_logger
+from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 
 logger = get_logger(__name__)
 
@@ -71,7 +71,7 @@ def calc_change(
     idx = lookback * 60 // interval
     change = round((float(data.iloc[0]) / float(data.iloc[idx]) - 1) * 100, round_to)
 
-    color = GREEN if change > 0 else RED
+    color = ANSI_COLORS["fg"]["green"] if change > 0 else ANSI_COLORS["fg"]["red"]
     logger.info(f"{symbol}: {color}{change}{RESET}%")
     return change
 

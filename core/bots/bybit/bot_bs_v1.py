@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Iterator, Union
 
@@ -5,17 +6,14 @@ import pandas as pd
 from config import BYBIT_CONFIG_PATH, BYBIT_DATA_PATH
 from core.scripts.bybit.api import get_kline, get_symbol_info
 from core.scripts.tools.files import read_file
-from core.scripts.tools.logger import BLUE_BG, GREEN, RED, RESET, get_logger
+from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 from core.scripts.tools.metrics import calc_change
 
 logger = get_logger(__name__)
 
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
-EXCLUDE_SYMBOLS = {"USDCUSDT", "FUSDCUSDT"}
+SYMBOLS_LIKE = r"^[A-Z]+USDT$"
 MIN_VOLUME, MIN_CHANGE = 2000000, 2
-LOOKBACK = 1
-INTERVAL = "15"
-DAILY_RESISTANCE_LOOKBACK = 10
 SL_PERCENTAGE, TP_PERCENTAGE = 2, 5
 
 
@@ -32,7 +30,7 @@ def get_tradeable_symbols(
     symbols = {
         symbol["symbol"]
         for symbol in get_symbol_info()["result"]["list"]
-        if symbol["symbol"] not in EXCLUDE_SYMBOLS
+        if re.match(SYMBOLS_LIKE, symbol["symbol"])
     }
 
     end = datetime.now(timezone.utc)
@@ -91,7 +89,7 @@ def check_breakout(symbol: str, resistance: float, data: pd.DataFrame) -> Union[
         tp = ep + (1 + TP_PERCENTAGE / 100)
 
         logger.info(
-            f"BREAKOUT | {symbol}: EP={round(ep, 5)}, {RED}SL={round(sl, 5)}{RESET}, {GREEN}TP={round(tp, 5)}{RESET}"
+            f"{ANSI_COLORS['bg']['green']}BREAKOUT | {symbol}: EP={round(ep, 5)}, SL={round(sl, 5)}, TP={round(tp, 5)}{RESET}"
         )
         return {"symbol": symbol, "ep": ep, "sl": sl, "tp": tp}
 
@@ -110,7 +108,7 @@ def main():
     for symbol_data in tradeable_symbols:
         symbol = symbol_data["symbol"].iloc[0]
         resistance = get_daily_resistance_level(symbol=symbol, start=start, end=end, config=config)
-        logger.info(f"{BLUE_BG}RESISTANCE | {symbol}: {resistance}{RESET}")
+        logger.info(f"{ANSI_COLORS['bg']['yellow']}RESISTANCE | {symbol}: {resistance}{RESET}")
 
         trade = check_breakout(symbol=symbol, resistance=resistance, data=symbol_data)
         if trade:
@@ -120,5 +118,18 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--i", type=str, required=False, default="15")
+    parser.add_argument("--lb", type=int, required=False, default=1)
+    parser.add_argument("--drlb", type=int, required=False, default=10)
+
+    args = parser.parse_args()
+
+    INTERVAL = args.i
+    LOOKBACK = args.lb
+    DAILY_RESISTANCE_LOOKBACK = args.drlb
+
     main()
 # NOTUSDT: 0.010561

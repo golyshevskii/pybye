@@ -6,7 +6,7 @@ from core.scripts.bybit.api import get_kline, get_symbol_info
 from core.scripts.bybit.utils import to_min_interval
 from core.scripts.tools.dtt import to_unix
 from core.scripts.tools.files import read_file
-from core.scripts.tools.logger import RESET, YELLOW_BG, get_logger
+from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 from core.scripts.tools.metrics import calc_change, calc_sma
 from core.scripts.tools.packers import pack_data
 
@@ -137,6 +137,6 @@ def scan_bybit_symbol(
     scaned_symbols = pd.DataFrame(changes).sort_values(by="change", ascending=False)
     scaned_symbols.to_csv(f"{BYBIT_DATA_PATH}scan/{file_name}", index=False)
 
-    logger.info(f"Top token: {YELLOW_BG}{scaned_symbols['symbol'].iloc[0]}{RESET}")
+    logger.info(f"Top token: {ANSI_COLORS['bg']['pink']}{scaned_symbols['symbol'].iloc[0]}{RESET}")
     logger.debug("END")
     return file_name
