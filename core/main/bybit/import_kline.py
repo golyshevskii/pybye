@@ -4,7 +4,6 @@ from core.scripts.bybit.manager import import_bybit_kline
 from core.scripts.tools.metrics import calc_rolling_sr_levels
 
 if __name__ == "__main__":
-    # from datetime import datetime, timedelta
     import argparse
 
     parser = argparse.ArgumentParser()

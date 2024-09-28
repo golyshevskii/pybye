@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from backtesting import Backtest
-from config import BYBIT_DWH_PATH
+from config import BYBIT_DATA_PATH
 from core.scripts.tools.logger import get_logger
 from tests.tools.backtest import BreakoutStrategy
 
@@ -45,8 +45,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     SYMBOL = args.symbol
 
-    D_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_{SYMBOL}_spot_D.csv")
-    H_kline = pd.read_csv(f"{BYBIT_DWH_PATH}kline/bybit_kline_{SYMBOL}_spot_60.csv")
+    D_kline = pd.read_csv(f"{BYBIT_DATA_PATH}kline/bybit_kline_{SYMBOL}_spot_D.csv")
+    H_kline = pd.read_csv(f"{BYBIT_DATA_PATH}kline/bybit_kline_{SYMBOL}_spot_60.csv")
 
     # Convert start_time to datetime and set it as index for better results in the backtest
     D_kline["start_time"] = pd.to_datetime(D_kline["start_time"], unit="ms", utc=True)
@@ -65,9 +65,9 @@ if __name__ == "__main__":
     bs = BreakoutStrategy
     bs.RL = D_kline["resistance"]
 
-    bt = Backtest(H_kline, bs, cash=100000, commission=0.002)
+    bt = Backtest(H_kline, bs, cash=100, commission=0.01)
     # optimize(bt)
 
     stats = bt.run()
-    logger.info(stats)
+    logger.info(f"{SYMBOL}\n{stats}")
     bt.plot()
