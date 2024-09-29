@@ -6,22 +6,16 @@ from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 logger = get_logger(__name__)
 
 
-def calc_rolling_sr_levels(
-    data: pd.DataFrame, window_size: int, sort_by: str = "start_time", ascending: bool = True
-) -> pd.DataFrame:
+def calc_rolling_sr_levels(data: pd.DataFrame, window: int) -> pd.DataFrame:
     """
     Calculates support and resistance levels using a rolling window.
 
     Params:
         data: DataFrame containing the price data.
-        window_size: Window size for the rolling window.
-        sort_by: Column to sort by.
-        ascending: Whether to sort in ascending order.
+        window: Window size for the rolling window.
     """
-    data = data.sort_values(by=sort_by, ascending=ascending)
-
-    data["resistance"] = data["close_price"].rolling(window=window_size, min_periods=1).max().shift(1)
-    data["support"] = data["close_price"].rolling(window=window_size, min_periods=1).min().shift(1)
+    data["resistance"] = data["close_price"].rolling(window=window, min_periods=1).max().shift(1)
+    data["support"] = data["close_price"].rolling(window=window, min_periods=1).min().shift(1)
 
     logger.info("Rolling support and resistance levels have been calculated")
     return data

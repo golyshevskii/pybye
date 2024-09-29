@@ -7,8 +7,8 @@ logger = get_logger(__name__)
 
 class BreakoutStrategyV1(Strategy):
     ATR_PERIOD = 10
-    TP_PERCENTAGE = 9
-    SL_PERCENTAGE = 3
+    TP_PERCENTAGE = 2
+    SL_PERCENTAGE = 4
     RL = None
 
     def init(self):
@@ -16,16 +16,14 @@ class BreakoutStrategyV1(Strategy):
 
     def next(self):
         current_time = self.data.index[-1]
-        resistance = self.RL[self.RL.index <= current_time].iloc[-1]
+        resistance = self.RL.asof(current_time)
 
         close_price = self.data.Close[-1]
         if close_price > resistance:
-            ep = (resistance + close_price) / 2
+            sl = close_price * (1 - self.SL_PERCENTAGE / 100)
+            tp = close_price * (1 + self.TP_PERCENTAGE / 100)
 
-            sl = ep * (1 - self.SL_PERCENTAGE / 100)
-            tp = ep * (1 + self.TP_PERCENTAGE / 100)
-
-            if sl <= 0 or sl >= ep or tp <= ep:
+            if sl <= 0 or sl >= close_price or tp <= close_price:
                 return
 
             try:
