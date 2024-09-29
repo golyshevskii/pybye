@@ -32,10 +32,10 @@ if __name__ == "__main__":
 
     # Run the backtest
     bs = BreakoutStrategyV1
-    bs.RL = D_kline["resistance"]
+    bs.RL = D_kline["resistance_2"]
 
     bt = Backtest(kline, bs, cash=100, commission=0.001)
-    # optimize(bt)
+    # soptimize(bt)
 
     stats = bt.run()
     logger.info(f"{SYMBOL}\n{stats}")

@@ -17,6 +17,10 @@ def calc_rolling_sr_levels(data: pd.DataFrame, window: int) -> pd.DataFrame:
     data["resistance"] = data["close_price"].rolling(window=window, min_periods=1).max().shift(1)
     data["support"] = data["close_price"].rolling(window=window, min_periods=1).min().shift(1)
 
+    data["mean_high"] = data["high_price"].rolling(window=window, min_periods=1).mean()
+    data["std_high"] = data["high_price"].rolling(window=window, min_periods=1).std()
+    data["resistance_2"] = data["mean_high"] + data["std_high"]
+
     logger.info("Rolling support and resistance levels have been calculated")
     return data
 

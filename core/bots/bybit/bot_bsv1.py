@@ -139,4 +139,3 @@ if __name__ == "__main__":
     DAILY_RESISTANCE_LOOKBACK = args.drlookback
 
     main()
-# NOTUSDT: 0.010561
