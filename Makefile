@@ -1,10 +1,15 @@
 # System
 ROOT_DIR := $(shell powershell -Command "(Get-Location).Path")
+ROOT_DIR_MAC := $(shell pwd)
+
 env:
 	powershell -Command "Get-ChildItem Env:"
 
 path:
 	powershell -Command "$$env:PYTHONPATH='$$env:PYTHONPATH;$(ROOT_DIR)';
+
+mac-path:
+	export PYTHONPATH=$(ROOT_DIR_MAC)
 
 # Dependencies
 init:

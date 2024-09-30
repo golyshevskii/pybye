@@ -8,7 +8,7 @@ from core.scripts.tools.dtt import to_unix
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 from core.scripts.tools.metrics import calc_change, calc_sma
-from core.scripts.tools.packers import pack_data
+from core.scripts.tools.packers import pack_data, pack_kline
 
 logger = get_logger(__name__)
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
@@ -32,17 +32,15 @@ def import_bybit_kline(
     """
     logger.debug("BEGIN")
 
-    data = get_kline(category=category, symbol=symbol, interval=interval, start=start, end=end)
+    kline = get_kline(category=category, symbol=symbol, interval=interval, start=start, end=end)
 
     config = MARKET_CONFIG["kline"]
-    packed_data = pack_data(
-        data["result"]["list"],
-        config["columns"],
-        {"category": category, "symbol": symbol, "interval": interval},
+    packed_kline = pack_kline(
+        symbol=symbol, kline=kline["result"]["list"], columns=config["columns"], sort=True
     )
 
     file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
-    packed_data.to_csv(f"{BYBIT_DATA_PATH}kline/{file_name}", index=False)
+    packed_kline.to_csv(f"{BYBIT_DATA_PATH}kline/{file_name}")
 
     logger.debug("END")
     return file_name

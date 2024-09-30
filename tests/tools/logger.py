@@ -17,7 +17,7 @@ ANSI_COLORS = {
         "yellow": f"{ESC}[1;48;5;227m",
         "pp": f"{ESC}[1;48;5;207m",
     },
-    "reset": f"{ESC}[0m"
+    "reset": f"{ESC}[0m",
 }
 
 print(ANSI_COLORS["fg"]["green"], "BREAKOUT", ANSI_COLORS["reset"])

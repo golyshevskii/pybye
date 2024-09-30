@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import Any, Dict, Union
 
-from config import BYBIT_DEMO_API_KEY, BYBIT_DEMO_API_SECRET
+from config import BYBIT_DEMOV2_API_KEY, BYBIT_DEMOV2_API_SECRET
 from core.scripts.tools.dtt import to_unix
 from core.scripts.tools.logger import get_logger
 from pybit.unified_trading import HTTP
 
 logger = get_logger(__name__)
-session = HTTP(api_key=BYBIT_DEMO_API_KEY, api_secret=BYBIT_DEMO_API_SECRET)
+session = HTTP(api_key=BYBIT_DEMOV2_API_KEY, api_secret=BYBIT_DEMOV2_API_SECRET, testnet=True)
 
 
 def get_kline(
@@ -52,3 +52,23 @@ def get_symbol_info(category: str = "spot", symbol: str = None) -> Dict[str, Any
     """
     logger.info(f"Importing {symbol or 'all'} symbol info")
     return session.get_instruments_info(category=category, symbol=symbol)
+
+
+def get_account_balance(account_type: str = "SPOT", coin: str = "USDT") -> Dict[str, Any]:
+    """
+    Extracts account balance from the Bybit API.
+
+    Params:
+        account_type: Account type (spot, linear, inverse).
+        coin: Coin in which to get the balance. Example: USDT
+    """
+    logger.info(f"Importing {coin} balance for {account_type} account")
+    return session.get_wallet_balance(accountType=account_type, coin=coin)
+
+
+def get_spot_asset_info(coin: str = "USDT") -> Dict[str, Any]:
+    """
+    Extracts spot asset info from the Bybit API.
+    """
+    logger.info("Importing spot asset info")
+    return session.get_spot_asset_info(accountType="SPOT", coin=coin)
