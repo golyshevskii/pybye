@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
 SYMBOLS_LIKE = r"^[A-Z]+USDT$"
 MIN_VOLUME, MIN_CHANGE = 1000000, 0.1
-SL_PERCENTAGE, TP_PERCENTAGE = 2, 5
+SL_PERCENTAGE, TP_PERCENTAGE = 3, 4
 ROUND_TO = 10
 
 
