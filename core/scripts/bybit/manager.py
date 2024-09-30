@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Union
 
 import pandas as pd
 from config import BYBIT_CONFIG_PATH, BYBIT_DATA_PATH
@@ -15,8 +16,8 @@ MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)
 
 
 def import_bybit_kline(
-    symbol: str, interval: str, start: str = None, end: str = None, category: str = "spot"
-) -> str:
+    symbol: str, interval: str, start: str = None, end: str = None, category: str = "spot", csv=False
+) -> Union[str, pd.DataFrame]:
     """
     Imports candle stick data from the Bybit API.
 
@@ -26,9 +27,11 @@ def import_bybit_kline(
         start: Datetime from which to start. Format: "YYYY-MM-DD HH:MM:SS"
         end: Datetime until which to end. Format: "YYYY-MM-DD HH:MM:SS"
         category: Product type (spot, linear, inverse).
+        csv: Whether to return the data as a CSV file.
 
     Returns:
         file_name: Name of the file where the data is stored.
+        packed_kline: Packed candle stick data.
     """
     logger.debug("BEGIN")
 
@@ -39,11 +42,15 @@ def import_bybit_kline(
         symbol=symbol, kline=kline["result"]["list"], columns=config["columns"], sort=True
     )
 
-    file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
-    packed_kline.to_csv(f"{BYBIT_DATA_PATH}kline/{file_name}")
+    if csv:
+        file_name = config["file_name"].format(symbol=symbol, category=category, interval=interval)
+        packed_kline.to_csv(f"{BYBIT_DATA_PATH}kline/{file_name}")
+
+        logger.debug("END")
+        return file_name
 
     logger.debug("END")
-    return file_name
+    return packed_kline
 
 
 def import_bybit_symbol_info(symbol: str = None, category: str = "spot") -> str:

@@ -2,7 +2,7 @@ import pandas as pd
 from backtesting import Backtest
 from config import BYBIT_DATA_PATH
 from core.scripts.tools.logger import get_logger
-from tests.tools.breakout import BreakoutStrategyV1
+from tests.strategy.breakout import BreakoutStrategyV1
 from tests.tools.optimizer import optimize
 
 logger = get_logger(__name__)

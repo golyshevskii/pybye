@@ -4,7 +4,7 @@ from config import BYBIT_CONFIG_PATH
 from core.scripts.bybit.api import get_kline
 from core.scripts.tools.files import read_file
 from core.scripts.tools.logger import get_logger
-from tests.tools.breakout import BreakoutStrategyV2
+from tests.strategy.breakout import BreakoutStrategyV2
 from tests.tools.optimizer import optimize
 
 MARKET_CONFIG = read_file(f"{BYBIT_CONFIG_PATH}market.json", is_json=True)

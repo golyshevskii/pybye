@@ -60,3 +60,46 @@ class BreakoutStrategyV2(Strategy):
                 self.buy(sl=sl, tp=tp)
             except ValueError:
                 return
+
+
+class MultiframeBreakout(Strategy):
+    """
+    Combine breakout strategies across multiple timeframes to filter false signals and increase the accuracy of breakouts.
+    """
+
+    SMA_PERIOD = 20
+    SL_PERCENTAGE, TP_PERCENTAGE = 1, 5
+    RLD, RL4H, RL1H, RL15M = None, None, None, None
+
+    def init(self):
+        self.sma = self.I(SMA, self.data.Close, self.SMA_PERIOD)
+
+    def next(self):
+        timestamp = self.data.index[-1]
+
+        resistance_d = self.RLD.asof(timestamp)
+        resistance_4h = self.RL4H.asof(timestamp)
+        resistance_1h = self.RL1H.asof(timestamp)
+        resistance_15m = self.RL15M.asof(timestamp)
+
+        vol = self.data.Volume[-1]
+        avg_vol = self.data.AvgVolume[-1]
+
+        cp = self.data.Close[-1]
+        if (
+            cp > resistance_d
+            and cp > resistance_4h
+            and cp > resistance_1h
+            and cp > resistance_15m
+            and vol > avg_vol
+        ):
+            sl = cp * (1 - self.SL_PERCENTAGE / 100)
+            tp = cp * (1 + self.TP_PERCENTAGE / 100)
+
+            if sl <= 0 or sl >= cp or tp <= cp:
+                return
+
+            try:
+                self.buy(sl=sl, tp=tp)
+            except ValueError:
+                return

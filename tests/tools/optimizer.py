@@ -14,8 +14,8 @@ def optimize(bt: Backtest):
         bt: The Backtest object
     """
     optimizer, heatmap = bt.optimize(
-        TP_PERCENTAGE=range(1, 10, 1),
-        SL_PERCENTAGE=range(1, 5, 1),
+        TP_PERCENTAGE=range(1, 12, 1),
+        SL_PERCENTAGE=range(1, 6, 1),
         maximize="Equity Final [$]",
         return_heatmap=True,
     )
