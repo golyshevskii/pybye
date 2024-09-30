@@ -12,7 +12,7 @@ isort = "^5.13.2"
 flake8 = "^7.1.1"
 
 [tool.black]
-line-length = 120
+line-length = 110
 target-version = ['py39']
 exclude = '''
   /(
