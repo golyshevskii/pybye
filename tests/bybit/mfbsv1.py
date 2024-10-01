@@ -62,4 +62,3 @@ if __name__ == "__main__":
     stats = bt.run()
     print(f"{SYMBOL}\n{stats}")
     bt.plot()
-    
