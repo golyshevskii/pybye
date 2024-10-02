@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pandas as pd
+import pandas_ta as pta
 from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 
 logger = get_logger(__name__)
@@ -83,3 +84,21 @@ def calc_sma(data: pd.Series, window_size: int) -> Optional[float]:
         return
 
     return data.rolling(window=window_size).mean().iloc[-1]
+
+
+def calc_scalp_metrics(df: pd.DataFrame, **kwargs) -> None:
+    """
+    Calculates scalping metrics. Like:
+    - EMA
+    - RSI
+    - Bollinger Bands
+    - Average True Range
+    """
+    df["SEMA"] = pta.ema(df.Close, length=kwargs["sema_len"])
+    df["FEMA"] = pta.ema(df.Close, length=kwargs["fema_len"])
+    df["RSI"] = pta.rsi(df.Close, length=kwargs["rsi_len"])
+
+    BBANDS = pta.bbands(df.Close, length=kwargs["bbands_len"], std=kwargs["bbands_std"])
+    df["ATR"] = pta.atr(df.High, df.Low, df.Close, length=kwargs["atr_len"])
+
+    return df.join(BBANDS)

@@ -10,15 +10,16 @@ python = "^3.11"
 black = "^24.8.0"
 isort = "^5.13.2"
 flake8 = "^7.1.1"
-pandas = "^2.2.2"
-numpy = "^2.1.1"
 pybit = "^5.8.0"
 python-dotenv = "^1.0.1"
+pandas-ta = {git = "https://github.com/twopirllc/pandas-ta.git", rev = "development"}
+pandas = "^2.2.3"
 backtesting = "^0.3.3"
 bokeh = "3.1.0"
 scikit-optimize = "^0.10.2"
 seaborn = "^0.13.2"
-pandas-ta = "^0.3.14b0"
+tqdm = "^4.66.5"
+plotly = "^5.24.1"
 
 [tool.black]
 line-length = 110

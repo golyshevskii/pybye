@@ -1,7 +1,13 @@
 from typing import Any, Dict, List, Union
 
 import pandas as pd
+from tqdm import tqdm
+
+tqdm.pandas()
+
 from core.scripts.tools.logger import get_logger
+from core.scripts.tools.metrics import calc_scalp_metrics
+from core.scripts.tools.signals import set_scalp_signal
 
 logger = get_logger(__name__)
 
@@ -57,3 +63,19 @@ def pack_kline(
 
     logger.info(f"Kline has been packed. Shape: {data.shape}.")
     return data
+
+
+def setup_scalp_kline(kline: pd.DataFrame, **kwargs) -> pd.DataFrame:
+    """
+    Packs kline data with scalping metrics and order points.
+
+    Params:
+        kline: DataFrame containing the kline data.
+    """
+    df = kline.copy()
+
+    df = calc_scalp_metrics(df, **kwargs)
+    df["signal"] = df.progress_apply(lambda row: set_scalp_signal(df, row.name, **kwargs), axis=1)
+
+    logger.info(f"Kline has been packed. Shape: {df.shape}.")
+    return df
