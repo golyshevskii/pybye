@@ -70,8 +70,9 @@ class MultiframeBreakout(Strategy):
     """
 
     SMA_PERIOD = 20
-    SL_PERCENTAGE, TP_PERCENTAGE = 1, 5
+    SL_PERCENTAGE, TP_PERCENTAGE = 1, 3.5
     RLD, RL4H, RL1H, RL15M = None, None, None, None
+    SLD, SL4H, SL1H, SL15M = None, None, None, None
 
     def init(self):
         self.sma = self.I(SMA, self.data.Close, self.SMA_PERIOD)
@@ -83,6 +84,11 @@ class MultiframeBreakout(Strategy):
         resistance_4h = self.RL4H.asof(timestamp)
         resistance_1h = self.RL1H.asof(timestamp)
         resistance_15m = self.RL15M.asof(timestamp)
+
+        support_d = self.SLD.asof(timestamp)
+        support_4h = self.SL4H.asof(timestamp)
+        support_1h = self.SL1H.asof(timestamp)
+        support_15m = self.SL15M.asof(timestamp)
 
         vol = self.data.Volume[-1]
         avg_vol = self.data.AvgVolume[-1]
@@ -103,6 +109,18 @@ class MultiframeBreakout(Strategy):
 
             try:
                 self.buy(sl=sl, tp=tp)
+            except ValueError:
+                return
+
+        elif cp < support_d and cp < support_4h and cp < support_1h and cp < support_15m and vol > avg_vol:
+            sl = cp * (1 + self.SL_PERCENTAGE / 100)
+            tp = cp * (1 - self.TP_PERCENTAGE / 100)
+
+            if sl <= 0 or sl <= cp or tp >= cp:
+                return
+
+            try:
+                self.sell(sl=sl, tp=tp)
             except ValueError:
                 return
 
