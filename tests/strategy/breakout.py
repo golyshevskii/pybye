@@ -1,10 +1,43 @@
 import numpy as np
 from backtesting import Strategy
 from backtesting.lib import crossover
-from core.scripts.tools.logger import get_logger
+from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 from talib import ADX, ATR, SMA
 
 logger = get_logger(__name__)
+
+
+class Breakout(Strategy):
+    PERIOD = 20
+    TP_PERCENTAGE = 5
+    SL_PERCENTAGE = 1
+
+    def init(self):
+        self.sma = self.I(SMA, self.data.Close, self.PERIOD)
+        self.sig = self.I(self.SIG)
+        self.rsi = self.I(self.RSI)
+
+    def next(self):
+        cp = self.data.Close[-1]
+        signal = self.data.Signal[-1]
+
+        if signal == 1:
+            logger.info(f"{ANSI_COLORS['bg']['green']}LONG {cp}{RESET}")
+            sl = cp * (1 - self.SL_PERCENTAGE / 100)
+            tp = cp * (1 + self.TP_PERCENTAGE / 100)
+            self.buy(sl=sl, tp=tp)
+
+        elif signal == -1:
+            logger.info(f"{ANSI_COLORS['bg']['red']}SHORT {cp}{RESET}")
+            sl = cp * (1 + self.SL_PERCENTAGE / 100)
+            tp = cp * (1 - self.TP_PERCENTAGE / 100)
+            self.sell(sl=sl, tp=tp)
+
+    def SIG(self):
+        return self.data.Signal
+
+    def RSI(self):
+        return self.data.RSI
 
 
 class BreakoutStrategyV1(Strategy):

@@ -2,13 +2,13 @@
     "kline": {
         "file_name": "bybit_kline_{symbol}_{category}_{interval}.csv",
         "columns": [
-            "start_time",
-            "open_price",
-            "high_price",
-            "low_price",
-            "close_price",
-            "volume",
-            "turnover"
+            "Time",
+            "Open",
+            "High",
+            "Low",
+            "Close",
+            "Volume",
+            "Turnover"
         ]
     },
     "symbol_info": {

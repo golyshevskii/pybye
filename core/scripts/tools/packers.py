@@ -37,7 +37,7 @@ def pack_kline(
     symbol: str,
     kline: List[Union[Dict[str, Any], List[str]]],
     columns: List[str],
-    index_column: str = "start_time",
+    index_column: str = "Time",
     sort: bool = False,
     asc: bool = True,
 ) -> pd.DataFrame:
