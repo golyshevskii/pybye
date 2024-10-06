@@ -1,0 +1,26 @@
+{
+    "kline": {
+        "file_name": "mexc_kline_{symbol}_{category}_{interval}.csv",
+        "columns": [
+            "Time",
+            "Open",
+            "High",
+            "Low",
+            "Close",
+            "Volume",
+            "Turnover"
+        ]
+    },
+    "symbol_info": {
+        "file_name": "mexc_symbol_info_{symbol}_{category}.csv",
+        "columns": [
+            "Symbol",
+            "Status"
+        ]
+    },
+    "ticker24h": {
+        "file_name": "mexc_ticker24h_{symbol}.csv",
+        "columns": [
+        ]
+    }
+}

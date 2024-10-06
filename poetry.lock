@@ -1376,6 +1376,20 @@ files = [
 ]
 
 [[package]]
+name = "pymexc"
+version = "1.0.11"
+description = "Unofficial python library for interacting with the MEXC crypto exchange"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "pymexc-1.0.11.tar.gz", hash = "sha256:2e05a73013d519eb19a92e4ee256ca0e92b8488022ab92154fefa623651ae128"},
+]
+
+[package.dependencies]
+requests = "*"
+websocket-client = "*"
+
+[[package]]
 name = "pyparsing"
 version = "3.1.4"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -1786,4 +1800,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a1d8c8154487890c556381c88a93eb2f734c52817a8ec0c2c03ebfab114c86ab"
+content-hash = "cf58a87ac63727e6a30e4011a218d7284519348c8fe0e1417cc4c79f05bc1709"

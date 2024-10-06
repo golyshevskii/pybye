@@ -25,12 +25,12 @@ ANSI_COLORS = {
 }
 
 
-def get_logger(name):
+def get_logger(name, level=logging.DEBUG):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(level)
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(level)
 
     formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s: %(message)s")
     formatter.converter = time.gmtime

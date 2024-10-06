@@ -9,6 +9,7 @@ from tests.tools.optimizer import optimize
 
 logger = get_logger(__name__)
 
+
 def main():
     parser = ap.ArgumentParser()
     parser.add_argument("--symbol", type=str, required=False, default="BTCUSDT")
