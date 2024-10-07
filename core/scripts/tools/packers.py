@@ -29,17 +29,19 @@ def pack_data(
         for column, value in additional_data.items():
             df[column] = value
 
-    logger.info(f"Data has been packed. Shape: {df.shape}.")
+    logger.debug(f"Data has been packed. Shape: {df.shape}.")
     return df
 
 
 def pack_kline(
     symbol: str,
-    kline: List[Union[Dict[str, Any], List[str]]],
-    columns: List[str],
+    kline: Union[List[Union[Dict[str, Any], List[str]]], Dict[str, List[Any]]],
     index_column: str = "Time",
     sort: bool = False,
     asc: bool = True,
+    timeunit: str = "ms",
+    columns: List[str] = None,
+    rename_columns: Dict[str, str] = None,
 ) -> pd.DataFrame:
     """
     Packs kline data into the DataFrame with the symbol and start_time index.
@@ -51,17 +53,23 @@ def pack_kline(
         sort: Whether to sort the data.
         asc: Whether to sort in ascending order.
     """
-    data = pd.DataFrame(kline, columns=columns)
+    if isinstance(kline, list) and isinstance(kline[0], list):
+        data = pd.DataFrame(kline, columns=columns)
+    else:
+        data = pd.DataFrame(kline)
+
+    if rename_columns:
+        data.rename(columns=rename_columns, inplace=True)
 
     data["symbol"] = symbol
     data[index_column] = pd.to_numeric(data[index_column], errors="coerce")
-    data[index_column] = pd.to_datetime(data[index_column], unit="ms", utc=True)
+    data[index_column] = pd.to_datetime(data[index_column], unit=timeunit, utc=True)
     data.set_index(index_column, inplace=True)
 
     if sort:
         data.sort_index(inplace=True, ascending=asc)
 
-    logger.info(f"Kline has been packed. Shape: {data.shape}.")
+    logger.debug(f"Kline has been packed. Shape: {data.shape}.")
     return data
 
 
@@ -77,5 +85,5 @@ def setup_scalp_kline(kline: pd.DataFrame, **kwargs) -> pd.DataFrame:
     df = calc_scalp_metrics(df, **kwargs)
     df["signal"] = df.progress_apply(lambda row: set_scalp_signal(df, row.name, **kwargs), axis=1)
 
-    logger.info(f"Kline has been packed. Shape: {df.shape}.")
+    logger.debug(f"Kline has been packed. Shape: {df.shape}.")
     return df

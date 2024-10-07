@@ -1,7 +1,9 @@
 import logging
+from datetime import datetime
 from typing import Any, Dict, List, Union
 
 from config import MEXC_API_KEY, MEXC_API_SECRET
+from core.scripts.tools.dtt import to_unix
 from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
 from pymexc import futures, spot
 
@@ -11,6 +13,44 @@ SCLIENT = spot.HTTP(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
 FCLIENT = futures.HTTP(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
 
 PFG = ANSI_COLORS["fg"]["pink"]
+
+
+def get_kline(
+    category: str,
+    symbol: str,
+    interval: str,
+    start: Union[int, str, datetime] = None,
+    end: Union[int, str, datetime] = None,
+) -> Dict[str, Any]:
+    """
+    Extracts candle stick data from the MEXC API.
+
+    Params:
+        category: Product type (spot, futures).
+        symbol: Symbol name. Example: BTC_USDT
+        interval: Kline interval.
+            futures! ['Min1', 'Min5', 'Min15', 'Min30', 'Min60', 'Hour4', 'Hour8', 'Day1', 'Week1', 'Month1']
+            spot! ['1m', '5m', '15m', '30m', '60m', '4h', '1d', '1M']
+        start: Timestamp (s) from which to start
+        end: Timestamp (s) until which to end
+    """
+    logger.debug(f"Extracting {PFG}{interval}{RESET} kline data for {PFG}{symbol}{RESET}")
+
+    if category == "futures":
+        return FCLIENT.kline(
+            symbol=symbol,
+            interval=interval,
+            start=to_unix(start) if isinstance(start, (str, datetime)) else start,
+            end=to_unix(end) if isinstance(end, (str, datetime)) else end,
+        )
+
+    if category == "spot":
+        return SCLIENT.klines(
+            symbol=symbol.replace("_", ""),
+            interval=interval,
+            start=to_unix(start) if isinstance(start, (str, datetime)) else start,
+            end=to_unix(end) if isinstance(end, (str, datetime)) else end,
+        )
 
 
 def get_ticker_24h(symbol: Union[str, None] = "BTCUSDT") -> Union[Dict[str, Any], List[Dict[str, Any]]]:
