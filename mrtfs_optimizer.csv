@@ -1,0 +1,46 @@
+,0
+Start,2024-10-01 20:05:00+00:00
+End,2024-10-08 18:40:00+00:00
+Duration,6 days 22:35:00
+Exposure Time [%],2.75
+Equity Final [$],110.75694040000002
+Equity Peak [$],110.75694040000002
+Return [%],10.756940400000019
+Buy & Hold Return [%],8.220141544683274
+Return (Ann.) [%],10478.512362233654
+Volatility (Ann.) [%],5413.795170282892
+Sharpe Ratio,1.9355206528225763
+Sortino Ratio,inf
+Calmar Ratio,7771.364528835143
+Max. Drawdown [%],-1.3483490992288183
+Avg. Drawdown [%],-0.62645923579632
+Max. Drawdown Duration,0 days 01:05:00
+Avg. Drawdown Duration,0 days 00:29:00
+# Trades,1
+Win Rate [%],100.0
+Best Trade [%],10.778443113772473
+Worst Trade [%],10.778443113772473
+Avg. Trade [%],10.778443113772473
+Max. Trade Duration,0 days 04:30:00
+Avg. Trade Duration,0 days 04:30:00
+Profit Factor,
+Expectancy [%],10.778443113772473
+SQN,
+_strategy,"MeanReversionTrendStrategy(TP_PERCENTAGE=11,SL_PERCENTAGE=1,RSI_PERIOD=7,LEMA_PERIOD=50,SEMA_PERIOD=5,LRSI_THRESHOLD=45,SRSI_THRESHOLD=50)"
+_equity_curve,"                              Equity  DrawdownPct DrawdownDuration
+Time                                                              
+2024-10-01 20:05:00+00:00  100.00000          0.0              NaT
+2024-10-01 20:10:00+00:00  100.00000          0.0              NaT
+2024-10-01 20:15:00+00:00  100.00000          0.0              NaT
+2024-10-01 20:20:00+00:00  100.00000          0.0              NaT
+2024-10-01 20:25:00+00:00  100.00000          0.0              NaT
+...                              ...          ...              ...
+2024-10-08 18:20:00+00:00  110.75694          0.0              NaT
+2024-10-08 18:25:00+00:00  110.75694          0.0              NaT
+2024-10-08 18:30:00+00:00  110.75694          0.0              NaT
+2024-10-08 18:35:00+00:00  110.75694          0.0              NaT
+2024-10-08 18:40:00+00:00  110.75694          0.0              NaT
+
+[2000 rows x 3 columns]"
+_trades,"   Size  EntryBar  ExitBar  EntryPrice  ExitPrice       PnL  ReturnPct                 EntryTime                  ExitTime        Duration
+0    41      1457     1511    2.434159   2.696523  10.75694   0.107784 2024-10-06 21:30:00+00:00 2024-10-07 02:00:00+00:00 0 days 04:30:00"

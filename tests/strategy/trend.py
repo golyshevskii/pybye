@@ -46,3 +46,61 @@ class MeanReversionTrendStrategy(Strategy):
                 sl = cp * (1 + self.SL_PERCENTAGE / 100)
                 tp = cp * (1 - self.TP_PERCENTAGE / 100)
                 self.sell(sl=sl, tp=tp)
+
+
+class EMATrend(Strategy):
+    RP = 1.0
+    TPP = 10
+    SLP = 3
+    EMA_PERIOD = 50
+    LOOKBACK = 5
+
+    def init(self):
+        self.ema = self.I(talib.EMA, self.data.Close, timeperiod=self.EMA_PERIOD)
+
+    def set_stop_loss(self, direction):
+        if direction == 1:
+            low_swing = self.data.Close[-self.LOOKBACK :].min()
+            sl = low_swing * (1 - self.SLP / 100)
+        elif direction == -1:
+            high_swing = self.data.Close[-self.LOOKBACK :].max()
+            sl = high_swing * (1 + self.SLP / 100)
+        return sl
+
+    def risk_vol(self):
+        return self.equity * (self.RP / 100)
+
+    def next(self):
+        cp = self.data.Close[-1]
+
+        for trade in self.trades:
+            if trade.is_long:
+                nsl = self.set_stop_loss(1)
+                trade.sl = nsl if nsl > trade.sl else trade.sl
+            else:
+                nsl = self.set_stop_loss(-1)
+                trade.sl = nsl if nsl < trade.sl else trade.sl
+
+        if crossover(self.data.Close, self.ema):
+            # LONG
+            sl = self.set_stop_loss(1)
+            tp = cp * (1 + self.TPP / 100)
+
+            qty = round(float(self.risk_vol() / (cp - sl)))
+            qty = max(1, qty)
+            print(
+                f"{self.data.index[-1]}| LONG - Risk Vol: {self.risk_vol()}, SL: {sl}, TP: {tp}, Qty: {qty}"
+            )
+            self.buy(sl=sl, tp=tp)
+
+        elif crossover(self.ema, self.data.Close):
+            # SHORT
+            sl = self.set_stop_loss(-1)
+            tp = cp * (1 - self.TPP / 100)
+
+            qty = round(float(self.risk_vol() / (sl - cp)))
+            qty = max(1, qty)
+            print(
+                f"{self.data.index[-1]}| SHORT - Risk Vol: {self.risk_vol()}, SL: {sl}, TP: {tp}, Qty: {qty}"
+            )
+            self.sell(sl=sl, tp=tp)

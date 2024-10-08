@@ -2,27 +2,24 @@ import pandas as pd
 from backtesting import Backtest
 from core.scripts.mexc.manager import import_mexc_kline
 from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
-from tests.strategy.trend import MeanReversionTrendStrategy
-from tests.tools.optimizer import optimize_mrtfs
+from tests.strategy.trend import EMATrend
+from tests.tools.optimizer import optimize
 
 logger = get_logger(__name__)
 
 
 def test(kline: pd.DataFrame):
+    emat = EMATrend
+    bt = Backtest(kline, emat, cash=100, commission=0.002)
 
-    mrt = MeanReversionTrendStrategy
-    mrt.SL_PERCENTAGE = 1
-    mrt.TP_PERCENTAGE = 11
-    mrt.RSI_PERIOD = 7
-    mrt.SEMA_PERIOD = 5
-    mrt.LEMA_PERIOD = 50
-    mrt.LRSI_THRESHOLD = 45
-    mrt.SRSI_THRESHOLD = 50
-
-    bt = Backtest(kline, mrt, cash=100, commission=0.002)
-    # optimizer, heatmap = optimize_mrtfs(bt)
-    # optimizer.to_csv("mrtfs_optimizer.csv")
-    # print(optimizer)
+    params = {
+        "RP": range(1, 4, 1),
+        "TPP": range(5, 11, 1),
+        "SLP": range(3, 6, 1),
+        "EMA_PERIOD": range(20, 51, 10),
+        "LOOKBACK": range(5, 21, 5),
+    }
+    # optimize(bt, maximize="Equity Final [$]", params=params)
 
     stats = bt.run()
     logger.info(f"\n{stats}")
