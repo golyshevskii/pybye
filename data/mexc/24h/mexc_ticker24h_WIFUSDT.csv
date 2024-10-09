@@ -1,0 +1,2 @@
+symbol,priceChange,priceChangePercent,prevClosePrice,lastPrice,bidPrice,bidQty,askPrice,askQty,openPrice,highPrice,lowPrice,volume,quoteVolume,openTime,closeTime,count
+WIFUSDT,-0.131,-0.0557,2.351,2.22,2.219,7863.77,2.22,2963.8,2.351,2.389,2.188,5941683.7,13597933.383,1728194730068,1728194748877,

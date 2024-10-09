@@ -1,4 +1,8 @@
 import pandas as pd
+import pandas_ta as ta
+from core.scripts.tools.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def calc_ema_ls_signals(df: pd.DataFrame, kline_rn: int, lookback: int):
@@ -37,3 +41,39 @@ def set_scalp_signal(df: pd.DataFrame, kline_rn: int, lookback: int, **kwargs):
         # and df.RSI[current_candle]>40
         return 1
     return 0
+
+
+def set_donchian_breakout_signal(klines: pd.DataFrame, period: int, **kwargs):
+    """
+    Sets Donchian breakout signals
+
+    Params:
+        klines: DataFrame containing the candles data
+        period: Lookback period for the signal
+    """
+    logger.debug("Setting Donchian breakout signals")
+
+    klines["DonchianHigh"] = klines["High"].rolling(window=period).max()
+    klines["DonchianLow"] = klines["Low"].rolling(window=period).min()
+    klines["AvgVolume"] = klines["Volume"].rolling(window=period).mean()
+    klines["RSI"] = ta.rsi(klines["Close"], length=period)
+
+    klines["Signal"] = 0
+
+    # LONG
+    klines.loc[
+        (klines["Close"] > klines["DonchianHigh"].shift(1))
+        & (klines["Volume"] > klines["AvgVolume"])
+        & (klines["RSI"] < 63),
+        "Signal",
+    ] = 1
+
+    # SHORT
+    klines.loc[
+        (klines["Close"] < klines["DonchianLow"].shift(1))
+        & (klines["Volume"] > klines["AvgVolume"])
+        & (klines["RSI"] > 37),
+        "Signal",
+    ] = -1
+
+    logger.debug("Donchian breakout signals have been set")

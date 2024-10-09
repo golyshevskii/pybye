@@ -20,6 +20,7 @@ scikit-optimize = "^0.10.2"
 seaborn = "^0.13.2"
 tqdm = "^4.66.5"
 plotly = "^5.24.1"
+pymexc = "^1.0.11"
 
 [tool.black]
 line-length = 110
