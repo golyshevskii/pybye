@@ -104,3 +104,52 @@ class EMATrend(Strategy):
                 f"{self.data.index[-1]}| SHORT - Risk Vol: {self.risk_vol()}, SL: {sl}, TP: {tp}, Qty: {qty}"
             )
             self.sell(sl=sl, tp=tp)
+
+
+class BBMA(Strategy):
+    TPP = 10
+    SLP = 3
+    MAP = 3
+    LOOKBACK = 3
+
+    def init(self):
+        self.ma = self.I(talib.MA, self.data.Close, timeperiod=self.MAP)
+
+    def set_stop_loss(self, direction):
+        if direction == 1:
+            low_swing = self.data.Close[-self.LOOKBACK :].min()
+            sl = low_swing * (1 - self.SLP / 100)
+        elif direction == -1:
+            high_swing = self.data.Close[-self.LOOKBACK :].max()
+            sl = high_swing * (1 + self.SLP / 100)
+        return sl
+
+    def next(self):
+        cp1, cp2 = self.data.Close[-1], self.data.Close[-2]
+        cma = self.ma[-1]
+        bbu1, bbu2 = self.bbu[-1], self.bbu[-2]
+        bbl1, bbl2 = self.bbl[-1], self.bbl[-2]
+
+        if cp2 < bbu2 and cp1 > bbu1:
+            # SHORT
+            sl = self.set_stop_loss(-1)
+            tp = cp1 * (1 - self.TPP / 100)
+
+            qty = round(float(self.risk_vol() / (sl - cp1)))
+            qty = max(1, qty)
+            print(
+                f"{self.data.index[-1]}| SHORT - Risk Vol: {self.risk_vol()}, SL: {sl}, TP: {tp}, Qty: {qty}"
+            )
+            self.sell(sl=sl, tp=tp)
+
+        elif cp2 > bbl2 and cp1 < bbl1:
+            # LONG
+            sl = self.set_stop_loss(1)
+            tp = cp1 * (1 + self.TPP / 100)
+
+            qty = round(float(self.risk_vol() / (cp1 - sl)))
+            qty = max(1, qty)
+            print(
+                f"{self.data.index[-1]}| LONG - Risk Vol: {self.risk_vol()}, SL: {sl}, TP: {tp}, Qty: {qty}"
+            )
+            self.buy(sl=sl, tp=tp)
