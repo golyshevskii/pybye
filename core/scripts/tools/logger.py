@@ -11,6 +11,7 @@ ANSI_COLORS = {
         "red": f"{ESC}[1;38;5;197m",
         "violet": f"{ESC}[1;38;5;135m",
         "yellow": f"{ESC}[1;38;5;227m",
+        "black": f"{ESC}[1;38;5;232m",
     },
     "bg": {
         "green": f"{ESC}[1;48;5;47m",
@@ -23,6 +24,7 @@ ANSI_COLORS = {
     },
     "reset": RESET,
 }
+BLINK = f"{ESC}[32;5m"
 
 
 def get_logger(name, level=logging.DEBUG):

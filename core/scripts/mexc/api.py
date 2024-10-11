@@ -11,6 +11,8 @@ logger = get_logger(__name__, level=logging.INFO)
 
 SCLIENT = spot.HTTP(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
 FCLIENT = futures.HTTP(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
+SWEB_SOCKET = spot.WebSocket(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
+FWEB_SOCKET = futures.WebSocket(api_key=MEXC_API_KEY, api_secret=MEXC_API_SECRET)
 
 PFG = ANSI_COLORS["fg"]["pink"]
 
