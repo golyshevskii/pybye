@@ -1,4 +1,5 @@
 import numpy as np
+import pandas_ta as ta
 from backtesting import Strategy
 from backtesting.lib import crossover
 from core.scripts.tools.logger import ANSI_COLORS, RESET, get_logger
@@ -296,3 +297,36 @@ class SMACrossoverStrategy(Strategy):
         for trade in self.trades:
             if (self.data.index[-1] - trade.entry_time).total_seconds() / 60 > self.MAX_TRADE_DURATION:
                 trade.close()
+
+
+class BreakoutGE(Strategy):
+    def init(self):
+        self.rsi = self.I(lambda: self.data.RSI)
+        self.macd_line = self.I(lambda: self.data.MACD_line)
+        self.macd_signal_line = self.I(lambda: self.data.MACD_signal)
+
+    def next(self):
+        high_level = self.data.High[-self.lookback_period :].max()
+        low_level = self.data.Low[-self.lookback_period :].min()
+
+        # LONG
+        if (
+            crossover(self.data.Close, high_level)
+            and self.rsi[-1] < self.rsi_overbought
+            and crossover(self.macd_line, self.macd_signal_line)
+        ):
+            self.buy()
+
+        # SHORT
+        elif (
+            crossover(low_level, self.data.Close)
+            and self.rsi[-1] > self.rsi_oversold
+            and crossover(self.macd_signal_line, self.macd_line)
+        ):
+            self.sell()
+
+        if self.position.is_long and crossover(self.data.Close, low_level):
+            self.position.close()
+
+        elif self.position.is_short and crossover(self.data.Close, high_level):
+            self.position.close()

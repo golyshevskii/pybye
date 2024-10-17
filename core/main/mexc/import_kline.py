@@ -1,6 +1,6 @@
 import pandas as pd
 from config import MEXC_CONFIG_PATH
-from core.scripts.mexc.api import get_kline
+from core.scripts.mexc.manager import import_mexc_kline
 from core.scripts.tools.files import read_file
 
 MCONFIG = read_file(f"{MEXC_CONFIG_PATH}market.json", is_json=True)
@@ -19,5 +19,5 @@ if __name__ == "__main__":
     SYMBOL = args.symbol.upper()
     INTERVAL = args.interval
 
-    data = get_kline(CATEGORY, SYMBOL, INTERVAL)["data"]
-    print(pd.DataFrame(data).head(5))
+    # Day1
+    data = import_mexc_kline(category=CATEGORY, symbol=SYMBOL, interval=INTERVAL, csv=True)
